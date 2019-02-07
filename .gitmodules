@@ -1,0 +1,3 @@
+[submodule "catkin_ws/src/simple_arm"]
+	path = catkin_ws/src/simple_arm
+	url = https://github.com/udacity/RoboND-simple_arm/
