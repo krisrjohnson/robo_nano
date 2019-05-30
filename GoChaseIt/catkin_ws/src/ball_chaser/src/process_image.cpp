@@ -1,6 +1,8 @@
+// New code
 #include "ros/ros.h"
 #include "ball_chaser/DriveToTarget.h"
 #include <sensor_msgs/Image.h>
+
 
 // Define a global client that can request services
 ros::ServiceClient client;
@@ -8,14 +10,16 @@ ros::ServiceClient client;
 // This function calls the command_robot service to drive the robot in the specified direction
 void drive_robot(float lin_x, ang_z) 
 {
+	ROS_INFO_STREAM("Moving towards white ball");
 	// request service
 	ball_chaser::DriveToTarget srv;
 
 	// pass velocities to service
-	srv.linear_x = lin_x;
-	srv.angular_z = ang_z;
+	srv.request.linear_x = lin_x;
+	srv.request.angular_z = ang_z;
 
 	// call the drive_bot service and pass the requested velocities
+		// the if statement calls the service and if that service errors out (returns False) then the if fn is true (!False) and runs the error msg
 	if(!client.call(srv))
 			ROS_ERROR("Failed to call service drive_bot");
 }
@@ -24,13 +28,10 @@ void drive_robot(float lin_x, ang_z)
 void process_image_callback(const sensor_msgs::Image img)
 {
 	int pixel = -1;
-	int pixel_x_coord, img_loc;
-	// TODO: Loop through each pixel in the image and check if there's a bright white one
-	// Identify where in the img this pixel is, left, right, or middle
-	// Call the drive_bot fn and pass velocities to it
-	// Request a stop when there's no white ball seen by the camera
-	bool white_ball = false;
-
+	int pixel_x_coord = -1;
+	int white_pixel = 255;
+	// Loop through each pixel in the image and check if there's a bright white one; pixel's are stored in a single array, assign first white pixel to int pixel 
+		// this logic is fairly rudimentary, assumes only the white ball can be white in this world; takes first white pixel as the point location of the ball :(
 	for (int i=0; i < img.height * img.step; i++) {
 		if(img.data[i] == white_pixel) {
 			pixel = img.data[i];
@@ -39,18 +40,20 @@ void process_image_callback(const sensor_msgs::Image img)
 	}
 
 	if (pixel >= 0) {
-		// identify location as (left, middle, or right). Using labels (-1,0,1)
-			// img.data[] is step*rows big
-			// want to back out the x coordinate
-			// img.data[i] % width = x_coord [0-indexed]
+		// img.data[] is step*rows big
+		// want to back out the x coordinate
+		// img.data[i] % width = x_coord [0-indexed]
 		pixel_x_coord = float(pixel % img.width) / float(img.height);  // int division rounds down
-
-		if (pixel_x_coord < .333) {img_loc = -1;} 
-		else if (pixel_x_coord < .666) {img_loc = 0;}
-		else {img_loc = 1;}
-
-		// Call the drive_bot fn and pass velocities to it
-		// Request a stop when there's no white ball seen by the camera
+		/* based on where the white ball is in the image, turn a direction
+		turning is based on the angular z velocity, >0 is to the left, <0 to the right
+		When the white ball is down the middle, don't turn. 
+			There's a risk of continuously circling the ball w/ this logic
+		linear_x and angular_z are FLoat64 types
+		*/
+		if (pixel_x_coord < .333) {drive_robot(0.5, 0.3);} 
+		else if (pixel_x_coord < .666) {drive_robot(0.5, 0.0);}
+		else if (pixel_x_coord == -1) {drive_robot(0.5, -0.3);} 
+		else 						{drive_robot(0.0, 0.0);}
 	}
 
 }
