@@ -76,3 +76,9 @@ service steps:
 4. build and run dependencies in package.xml
 5. check ROS can see the new service file
 
+
+<gazebo reference="left_wheel">
+    <material>Gazebo/Green</material>
+</gazebo>
+
+
