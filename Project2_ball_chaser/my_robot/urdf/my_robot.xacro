@@ -1,0 +1,387 @@
+<?xml version='1.0'?>
+
+<robot name="my_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find my_robot)/urdf/my_robot.gazebo" />
+
+  <link name="robot_footprint"></link>
+
+    <joint name="robot_footprint_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="robot_footprint"/>
+      <child link="chassis" />
+    </joint>
+
+
+  <link name='chassis'>
+    <pose>0 0 0.15 0 0 0</pose>
+
+    <inertial>
+      <mass value="15.0"/>
+      <origin xyz="0.0 0 0" rpy=" 0 0 0"/>
+      <inertia
+          ixx="0.1" ixy="0" ixz="0"
+          iyy="0.1" iyz="0"
+          izz="0.1"
+      />
+    </inertial>
+
+    <!-- can group these rects in a link -->
+    <!-- creating an octagon using 4 rectangles -->
+    <!-- lifting these rectangles up and adding a box under to connect to wheels (wheel height is .3) -->
+      <!-- rectangle 1 -->
+      <collision name='collision_box1'>
+        <origin xyz="0 0 0.2" rpy=" 0 0 0"/> 
+        <geometry>
+          <box size="1 0.4142 0.1"/>
+        </geometry>
+      </collision>
+
+      <visual name='chassis_visual_box1'>
+        <origin xyz="0 0 0.2" rpy=" 0 0 0"/>
+        <geometry>
+          <box size="1 0.4142 0.1"/>
+        </geometry>
+      </visual>
+
+      <!-- rectangle 2 -->
+      <collision name='collision_box2'>
+        <origin xyz="0 0 0.2" rpy=" 0 0 0"/> 
+        <geometry>
+          <box size="0.4142 1 0.1"/>
+        </geometry>
+      </collision>
+
+      <visual name='chassis_visual_box2'>
+        <origin xyz="0 0 0.2" rpy=" 0 0 0"/>
+        <geometry>
+          <box size="0.4142 1 0.1"/>
+        </geometry>
+      </visual>
+
+      <!-- rectangle 3 -->
+      <collision name='collision_box3'>
+        <origin xyz="0 0 0.2" rpy="0 0 0.7854"/> 
+        <geometry>
+          <box size="0.4142 1 0.1"/>
+        </geometry>
+      </collision>
+
+      <visual name='chassis_visual_box3'>
+        <origin xyz="0 0 0.2" rpy="0 0 0.7854"/>
+        <geometry>
+          <box size="0.4142 1 0.1"/>
+        </geometry>
+      </visual>
+
+      <!-- rectangle 4 -->
+      <collision name='collision_box4'>
+        <origin xyz="0 0 0.2" rpy="0 0 -0.7854"/> 
+        <geometry>
+          <box size="0.4142 1 0.1"/>
+        </geometry>
+      </collision>
+
+      <visual name='chassis_visual_box4'>
+        <origin xyz="0 0 0.2" rpy="0 0 -0.7854"/>
+        <geometry>
+          <box size="0.4142 1 0.1"/>
+        </geometry>
+      </visual>
+
+	      <!-- wheel box -->
+	      <collision name='collision_wheelbox'>
+		<origin xyz="0 0 0.05" rpy="0 0 0"/> 
+		<geometry>
+		  <box size="0.8 0.4 0.3"/>
+		</geometry>
+	      </collision>
+
+	      <visual name='chassis_visual_wheelbox'>
+		<origin xyz="0 0 0.05" rpy="0 0 0"/>
+		<geometry>
+		  <box size="0.8 0.4 0.3"/>
+		</geometry>
+	      </visual>
+
+	<!-- casters to stop it falling over -->
+	<!-- can't figure out putting weight on the wheels w/out robo tipover-->
+
+	<collision name='back_caster_collision'>
+	  <origin xyz="-0.25 0 -0.1" rpy="0 0 0"/>
+	  <geometry>
+	    <sphere radius="0.0999"/>
+	  </geometry>
+	</collision>
+	
+	<visual name='back_caster_visual'>
+	  <origin xyz="-0.25 0 -0.1" rpy=" 0 0 0"/>
+	  <geometry>
+	    <sphere radius="0.1"/>
+	  </geometry>
+	</visual>
+
+	<collision name='front_caster_collision'>
+	  <origin xyz="0.25 0 -0.1" rpy=" 0 0 0"/>
+	  <geometry>
+	    <sphere radius="0.0999"/>
+	  </geometry>
+	</collision>
+
+	<visual name='front_caster_visual'>
+	  <origin xyz="0.25 0 -0.1" rpy=" 0 0 0"/>
+	  <geometry>
+	    <sphere radius="0.1"/>
+	  </geometry>
+	</visual>
+
+  </link>
+  <gazebo reference="chassis">
+    <material>Gazebo/Green</material>
+  </gazebo>
+
+
+  <!-- adding wheels -->
+<!--
+  <link name='front_right_wheel'>
+
+    <inertial name='front_right_wheel_inertia'>
+      <mass value="5.0"/>
+      <origin xyz="0.25 0.025 0" rpy=" 0 1.57 1.57"/>
+      <inertia
+          ixx="0.1" ixy="0" ixz="0"
+          iyy="0.1" iyz="0"
+          izz="0.1"
+      />
+    </inertial>
+
+    <collision name='front_right_wheel_collision'>
+      <origin xyz="0.25 0.025 0" rpy=" 0 1.57 1.57"/> 
+      <geometry>
+        <cylinder length=".05" radius="0.15"/>
+      </geometry>	
+    </collision>
+
+    <visual name='front_right_wheel_visual'>
+      <origin xyz="0.25 0.025 0" rpy=" 0 1.57 1.57"/>
+      <geometry>
+        <cylinder length="0.05" radius="0.15"/>
+      </geometry>
+      <material name="Blue"/>
+    </visual>
+  </link>
+  <gazebo reference="front_right_wheel"> 
+    <material>Gazebo/Orange</material> 
+  </gazebo>
+
+
+  <link name='front_left_wheel'>
+    
+    <inertial name='front_left_wheel_inertia'>
+      <mass value="5.0"/>
+      <origin xyz="0.25 -0.025 0" rpy=" 0 1.57 1.57"/>
+      <inertia
+          ixx="0.1" ixy="0" ixz="0"
+          iyy="0.1" iyz="0"
+          izz="0.1"
+      />
+    </inertial>
+
+    <collision name='front_left_wheel_collision'>
+      <origin xyz="0.25 -0.025 0" rpy=" 0 1.57 1.57"/> 
+      <geometry>
+        <cylinder length="0.05" radius="0.15"/>
+      </geometry>
+    </collision>
+
+    <visual name='front_left_wheel_visual'>
+      <origin xyz="0.25 -0.025 0" rpy=" 0 1.57 1.57"/>
+      <geometry>
+        <cylinder length="0.05" radius="0.15"/>
+      </geometry>
+
+    </visual>
+  </link>
+  <gazebo reference="front_left_wheel"> 
+    <material>Gazebo/Green</material>
+  </gazebo>
+-->
+
+
+  <link name='right_wheel'>
+    <inertial name='right_wheel_inertia'>
+      <mass value="5.0"/>
+      <origin xyz="0 0 0" rpy=" 0 1.57 1.57"/>
+      <inertia
+          ixx="0.1" ixy="0" ixz="0"
+          iyy="0.1" iyz="0"
+          izz="0.1"
+      />
+    </inertial>
+
+    <collision name='right_wheel_collision'>
+      <origin xyz="0 0 0" rpy=" 0 1.57 1.57"/>
+      <geometry>
+        <cylinder length="0.05" radius="0.15"/>
+      </geometry>	
+    </collision>
+
+    <visual name='right_wheel_visual'>
+      <origin xyz="0 0 0" rpy=" 0 1.57 1.57"/>
+      <geometry>
+        <cylinder length="0.05" radius="0.15"/>
+      </geometry>
+    </visual>
+  </link>
+  <gazebo reference="right_wheel"> 
+    <material>Gazebo/Orange</material> 
+  </gazebo>
+
+
+  <link name='left_wheel'>
+
+    <inertial name='left_wheel_inertia'>
+      <mass value="5.0"/>
+      <origin xyz="0 0 0" rpy=" 0 1.57 1.57"/>
+      <inertia
+          ixx="0.1" ixy="0" ixz="0"
+          iyy="0.1" iyz="0"
+          izz="0.1"
+      />
+    </inertial>
+
+    <collision name='left_wheel_collision'>
+      <origin xyz="0 0 0" rpy=" 0 1.57 1.57"/>
+      <geometry>
+        <cylinder length="0.05" radius="0.15"/>
+      </geometry>
+    </collision>
+
+    <visual name='left_wheel_visual'>
+      <origin xyz="0 0 0" rpy=" 0 1.57 1.57"/>
+      <geometry>
+        <cylinder length="0.05" radius="0.15"/>
+      </geometry>
+    </visual>
+  </link>
+  <gazebo reference="left_wheel"> <material>Gazebo/Blue</material> </gazebo>
+
+
+
+<!-- Sensors -->
+  <link name='camera'>
+
+
+    <inertial name='camera_inertia'>
+      <mass value=".1"/>
+      <origin xyz="0 0 0" rpy=" 0 0 0"/>
+      <inertia
+          ixx="1e-6" ixy="0" ixz="0"
+          iyy="1e-6" iyz="0"
+          izz="1e-6"
+      />
+    </inertial>
+
+    <visual name='camera_visual'>
+      <origin xyz="0 0 0" rpy="0 0 0 "/>
+      <geometry>
+        <box size="0.05 0.05 0.05"/>
+      </geometry>
+    </visual>
+
+    <collision name='camera_collision'>
+      <origin xyz="0 0 0" rpy="0 0 0 "/>
+      <geometry>
+        <box size="0.05 0.05 0.05"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="camera">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <link name="hokuyo">
+    <inertial name="hokuyo_inertial">
+      <mass value="1e-5"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia
+          ixx="1e-6" ixy="0" ixz="0"
+          iyy="1e-6" iyz="0"
+          izz="1e-6"
+      />
+    </inertial>
+
+    <visual name="hokuyo_visual">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://my_robot/meshes/hokuyo.dae"/>
+      </geometry>
+    </visual>
+
+    <collision name="hokuyo_collision">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+  </link>
+
+
+  <!-- joints -->
+<!--
+  <joint type="continuous" name="front_left_wheel_hinge">
+    <origin xyz="0 0.25 -0.05" rpy="0 0 0"/>
+    <parent link="chassis"/>
+    <child link="front_left_wheel"/>
+    <axis xyz="0 1 0" rpy="0 0 0"/>
+    <limit effort="10000" velocity="1000"/>
+    <dynamics damping="1.0" friction="1.0"/>
+  </joint>
+
+  <joint type="continuous" name="front_right_wheel_hinge">
+    <origin xyz="0 -0.25 -0.05" rpy="0 0 0"/>
+    <parent link="chassis"/>    
+    <child link="front_right_wheel"/>
+    <axis xyz="0 1 0" rpy="0 0 0"/>
+    <limit effort="10000" velocity="1000"/>
+    <dynamics damping="1.0" friction="1.0"/>
+  </joint>
+-->
+
+
+  <joint type="continuous" name="left_wheel_hinge">
+    <origin xyz="0 0.225 -0.05" rpy="0 0 0"/>
+    <parent link="chassis"/>
+    <child link="left_wheel"/>
+    <axis xyz="0 1 0" rpy="0 0 0"/>
+    <limit effort="10000" velocity="1000"/>
+    <dynamics damping="1.0" friction="1.0"/>
+  </joint>
+
+  <joint type="continuous" name="right_wheel_hinge">
+    <origin xyz="0 -0.225 -0.05" rpy="0 0 0"/>
+    <parent link="chassis"/>    
+    <child link="right_wheel"/>
+    <axis xyz="0 1 0" rpy="0 0 0"/>
+    <limit effort="10000" velocity="1000"/>
+    <dynamics damping="1.0" friction="1.0"/>
+  </joint>
+
+
+
+  <joint type="fixed" name="camera_joint">
+    <origin xyz="0.4 0 0.1" rpy="0 0 0"/>
+    <axis xyz="0 1 0" rpy="0 0 0"/>
+    <parent link="chassis"/>
+    <child link="camera"/>
+  </joint>
+
+  <joint type="fixed" name="hokuyo_joint">
+    <origin xyz="0.45 0 0.275" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <parent link="chassis"/>
+    <child link="hokuyo"/>
+  </joint>
+
+</robot>
+
